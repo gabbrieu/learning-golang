@@ -1,6 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
 
 type Node struct {
 	left  *Node
@@ -21,7 +27,6 @@ func (t *Tree) add(num int) {
 	}
 
 	currentNode := t.root
-
 	t.moveToAdd(num, currentNode, newNode)
 }
 
@@ -51,7 +56,6 @@ func (t *Tree) printInOrder() {
 	}
 
 	currentNode := t.root
-
 	t.inOrder(currentNode)
 }
 
@@ -73,6 +77,30 @@ func (t *Tree) inOrder(currentNode *Node) {
 	t.inOrder(currentNode.right)
 }
 
+func (t *Tree) search(num int) bool {
+	currentNode := t.root
+	return t.searchRecursive(num, currentNode)
+
+}
+
+func (t *Tree) searchRecursive(num int, currentNode *Node) bool {
+	if num == currentNode.value {
+		return true
+	}
+
+	if num < currentNode.value {
+		if currentNode.left == nil {
+			return false
+		}
+		return t.searchRecursive(num, currentNode.left)
+	}
+
+	if currentNode.right == nil {
+		return false
+	}
+	return t.searchRecursive(num, currentNode.right)
+}
+
 func main() {
 	binaryTree := &Tree{}
 
@@ -89,5 +117,24 @@ func main() {
 	binaryTree.add(5)
 	binaryTree.add(-10)
 
+	fmt.Print("Tree in order: ")
 	binaryTree.printInOrder()
+
+	fmt.Print("\n\nEnter a number to search on the Tree: ")
+	reader := bufio.NewReader(os.Stdin)
+	userInput, _ := reader.ReadString('\n')
+
+	userInputConverted, err := strconv.Atoi(strings.Trim(userInput, " \n"))
+
+	if err != nil {
+		panic(err)
+	}
+
+	numberExist := binaryTree.search(userInputConverted)
+
+	if numberExist {
+		fmt.Printf("The number %d exists on the Tree", userInputConverted)
+	} else {
+		fmt.Printf("The number %d does NOT exist on the Tree", userInputConverted)
+	}
 }
